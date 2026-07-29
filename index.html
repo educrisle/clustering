@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Segmentación de Clientes — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #14171C;
+    --surface: #1B1F26;
+    --surface-alt: #20242C;
+    --hairline: #2A2F38;
+    --text-primary: #F1F1EC;
+    --text-secondary: #9AA0AC;
+    --text-faint: #666D7A;
+    --premium: #D4A24E;
+    --alto-valor: #3E7C7B;
+    --bajo-numerosas: #6B7AA1;
+    --bajo-pequenos: #C97064;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    padding: 20px;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+
+  .eyebrow {
+    color: var(--text-faint);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 34px;
+    margin: 0 0 12px 0;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+  .chip {
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .chip .label {
+    color: var(--text-faint);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .chip .value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 32px;
+  }
+
+  .finding-label {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .finding-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .finding-num {
+    font-family: 'Fraunces', serif;
+    color: var(--bajo-pequenos);
+    font-size: 44px;
+  }
+  .finding-text {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+  }
+  .finding-p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    max-width: 620px;
+    margin-top: 14px;
+    line-height: 1.6;
+  }
+  .finding-p strong { color: var(--premium); font-weight: 600; }
+
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 19px;
+    margin: 0 0 4px 0;
+  }
+  .subtext { color: var(--text-faint); font-size: 12px; margin-bottom: 22px; }
+
+  .bar-row { margin-bottom: 18px; }
+  .bar-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .bar-head .name { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; }
+  .dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
+  .bar-head .n { font-family: 'IBM Plex Mono', monospace; color: var(--text-faint); font-size: 12px; }
+
+  .bar-sub { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .bar-sub-label { width: 90px; flex-shrink: 0; font-size: 11px; color: var(--text-secondary); }
+  .bar-track { flex: 1; background: var(--surface-alt); border-radius: 4px; height: 12px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; width: 0; transition: width 1s cubic-bezier(.16,1,.3,1); }
+  .bar-value { width: 48px; flex-shrink: 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+
+  .seg-card {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 12px;
+    padding: 16px;
+    border-top: 3px solid;
+  }
+  .seg-eyebrow { color: var(--text-faint); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .seg-name { font-family: 'Fraunces', serif; font-size: 18px; margin-bottom: 12px; }
+  .seg-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .stat { display: flex; align-items: flex-start; gap: 6px; }
+  .stat svg { flex-shrink: 0; margin-top: 2px; }
+  .stat .val { font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+  .stat .lbl { color: var(--text-faint); font-size: 10px; }
+  .seg-action {
+    border-top: 1px solid var(--hairline);
+    padding-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .section-title { margin: 0 0 4px 0; }
+  .section-sub { margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Informe de Segmentación de Clientes</div>
+  <h1>¿Quiénes son nuestros clientes?</h1>
+  <div class="chips">
+    <div class="chip"><span class="label">Clientes</span><span class="value">2.212</span></div>
+    <div class="chip"><span class="label">Volumen de compra analizado</span><span class="value">1.343.294 €</span></div>
+    <div class="chip"><span class="label">Segmentos</span><span class="value">4</span></div>
+  </div>
+
+  <div class="card">
+    <div class="finding-label">El hallazgo principal</div>
+    <div class="finding-line">
+      <span class="finding-num" id="countCustomers">0%</span>
+      <span class="finding-text">de los clientes generan solo</span>
+    </div>
+    <div class="finding-line">
+      <span class="finding-num" id="countRevenue">0%</span>
+      <span class="finding-text">del volumen de compra total</span>
+    </div>
+    <p class="finding-p">
+      Los dos segmentos de menor valor concentran casi la mitad de la base de clientes
+      pero apenas una fracción del ingreso. El segmento
+      <strong>Premium</strong> (solo el 25% de los clientes) aporta más de la mitad del
+      volumen de compra y es además el segmento más receptivo a las campañas de marketing.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Concentración de valor por segmento</h2>
+    <div class="subtext section-sub">% de clientes frente a % de volumen de compra que aporta cada segmento</div>
+    <div id="bars"></div>
+  </div>
+
+  <h2 class="section-title" style="margin-bottom:4px;">Perfil y recomendación por segmento</h2>
+  <div class="subtext" style="margin-bottom:16px;">Qué caracteriza a cada grupo y cómo actuar sobre él</div>
+  <div class="grid" id="segCards"></div>
+
+</div>
+
+<script>
+const ICONS = {
+  wallet: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>',
+  trending: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
+  users: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  repeat: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>',
+  target: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+};
+
+const SEGMENTS = [
+  { id: "premium", name: "Premium y Alta Respuesta", color: "var(--premium)", hex: "#D4A24E", n: 565, pctCustomers: 25.5, pctRevenue: 58.8, income: 76428, spend: 1399, family: 1.8, response: 51.0, action: "Fidelizar y cross-selling" },
+  { id: "alto_valor", name: "Alto Valor y Maduros", color: "var(--alto-valor)", hex: "#3E7C7B", n: 558, pctCustomers: 25.2, pctRevenue: 32.2, income: 58641, spend: 775, family: 2.8, response: 28.5, action: "Aumentar receptividad" },
+  { id: "bajo_numerosas", name: "Bajo Valor y Familias Numerosas", color: "var(--bajo-numerosas)", hex: "#6B7AA1", n: 707, pctCustomers: 32.0, pctRevenue: 5.5, income: 35880, spend: 104, family: 3.2, response: 12.9, action: "Reducir coste de contacto" },
+  { id: "bajo_pequenos", name: "Bajo Valor y Hogares Pequeños", color: "var(--bajo-pequenos)", hex: "#C97064", n: 382, pctCustomers: 17.3, pctRevenue: 3.5, income: 35765, spend: 124, family: 2.2, response: 17.3, action: "Evaluar potencial de activación" },
+];
+
+function fmtEuro(n) {
+  return new Intl.NumberFormat('es-ES').format(Math.round(n)) + ' €';
+}
+
+// --- Concentration bars ---
+const barsEl = document.getElementById('bars');
+const sorted = [...SEGMENTS].sort((a, b) => b.pctRevenue - a.pctRevenue);
+const maxPct = Math.max(...SEGMENTS.map(s => Math.max(s.pctCustomers, s.pctRevenue)));
+
+sorted.forEach((s, i) => {
+  const row = document.createElement('div');
+  row.className = 'bar-row';
+  row.innerHTML = `
+    <div class="bar-head">
+      <div class="name"><span class="dot" style="background:${s.hex}"></span>${s.name}</div>
+      <div class="n">${s.n.toLocaleString('es-ES')} clientes</div>
+    </div>
+    <div class="bar-sub">
+      <div class="bar-sub-label">% clientes</div>
+      <div class="bar-track"><div class="bar-fill" data-w="${(s.pctCustomers/maxPct)*100}" style="background:${s.hex};opacity:0.45;"></div></div>
+      <div class="bar-value">${s.pctCustomers.toFixed(1)}%</div>
+    </div>
+    <div class="bar-sub">
+      <div class="bar-sub-label">% compra</div>
+      <div class="bar-track"><div class="bar-fill" data-w="${(s.pctRevenue/maxPct)*100}" style="background:${s.hex};"></div></div>
+      <div class="bar-value">${s.pctRevenue.toFixed(1)}%</div>
+    </div>
+  `;
+  barsEl.appendChild(row);
+});
+
+// --- Segment cards ---
+const cardsEl = document.getElementById('segCards');
+SEGMENTS.forEach(s => {
+  const card = document.createElement('div');
+  card.className = 'seg-card';
+  card.style.borderTopColor = s.hex;
+  card.innerHTML = `
+    <div class="seg-eyebrow">${s.n.toLocaleString('es-ES')} clientes · ${s.pctCustomers.toFixed(1)}% de la base</div>
+    <div class="seg-name">${s.name}</div>
+    <div class="seg-stats">
+      <div class="stat"><span style="color:${s.hex}">${ICONS.wallet}</span><div><div class="val">${fmtEuro(s.income)}</div><div class="lbl">ingreso medio</div></div></div>
+      <div class="stat"><span style="color:${s.hex}">${ICONS.trending}</span><div><div class="val">${fmtEuro(s.spend)}</div><div class="lbl">gasto medio</div></div></div>
+      <div class="stat"><span style="color:${s.hex}">${ICONS.users}</span><div><div class="val">${s.family.toFixed(1)}</div><div class="lbl">tamaño familia</div></div></div>
+      <div class="stat"><span style="color:${s.hex}">${ICONS.repeat}</span><div><div class="val">${s.response.toFixed(1)}%</div><div class="lbl">resp. campañas</div></div></div>
+    </div>
+    <div class="seg-action"><span style="color:${s.hex}">${ICONS.target}</span>${s.action}</div>
+  `;
+  cardsEl.appendChild(card);
+});
+
+// --- Count-up animation ---
+function countUp(el, target, duration) {
+  const start = performance.now();
+  function step(ts) {
+    const progress = Math.min(1, (ts - start) / duration);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(target * eased) + '%';
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+const lowValue = SEGMENTS.filter(s => s.id.startsWith('bajo'));
+const lowValuePctCustomers = lowValue.reduce((s, x) => s + x.pctCustomers, 0);
+const lowValuePctRevenue = lowValue.reduce((s, x) => s + x.pctRevenue, 0);
+
+window.addEventListener('load', () => {
+  countUp(document.getElementById('countCustomers'), Math.round(lowValuePctCustomers), 1200);
+  countUp(document.getElementById('countRevenue'), Math.round(lowValuePctRevenue), 1200);
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(el => {
+      el.style.width = el.dataset.w + '%';
+    });
+  }, 100);
+});
+</script>
+</body>
+</html>
